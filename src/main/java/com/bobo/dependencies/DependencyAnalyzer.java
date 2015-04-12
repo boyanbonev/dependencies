@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,29 +90,6 @@ public class DependencyAnalyzer {
         }
 
         return result;
-    }
-
-    class Node<T> {
-        private final T value;
-        private List<Node<T>> directDependencies;
-
-        public Node(T value) {
-            this.value = value;
-            directDependencies = new LinkedList<DependencyAnalyzer.Node<T>>();
-        }
-
-        public Node(T value, List<Node<T>> directDependencies) {
-            this.value = value;
-            this.directDependencies = directDependencies;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public List<Node<T>> getDirectDependencies() {
-            return directDependencies;
-        }
     }
 
 }

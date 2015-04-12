@@ -25,7 +25,8 @@ public class DependencyAnalyzer {
      * @param <T>
      *
      * @param graph
-     *            the graph represented as node with list of direct dependencies
+     *            the graph represented as map of nodes. Each node is
+     *            represented by its value and list of direct dependencies
      * @return a map with key the node and value - a set of all of its
      *         dependencies
      */
@@ -47,7 +48,8 @@ public class DependencyAnalyzer {
      * node are all of the nodes pointing to it.
      *
      * @param graph
-     *            the graph represented as node with list of direct dependencies
+     *            the graph represented as map of nodes. Each node is
+     *            represented by its value and list of direct dependencies
      * @return a map with key the node and value - a set of all of its reverse
      *         dependencies
      */

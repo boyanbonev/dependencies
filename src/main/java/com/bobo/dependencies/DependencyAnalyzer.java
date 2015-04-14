@@ -36,8 +36,11 @@ public class DependencyAnalyzer {
 
         Map<T, Set<T>> result = new HashMap<T, Set<T>>(graph.size());
         for (Map.Entry<T, List<T>> entry : graph.entrySet()) {
-            Set<T> dependencies = calculateNodeDependencies(entry.getKey(), graph, new HashSet<T>());
-            result.put(entry.getKey(), dependencies);
+            Set<T> dependencies = result.get(entry.getKey());
+            if (dependencies == null || dependencies.isEmpty()) {
+               dependencies = calculateNodeDependencies(entry.getKey(), graph, new HashSet<T>(), result);
+               result.put(entry.getKey(), dependencies);
+            }
         }
 
         return result;
@@ -73,10 +76,10 @@ public class DependencyAnalyzer {
         return result;
     }
 
-    private <T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes) {
+   private <T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes, Map<T, Set<T>> result) {
         if (visitedNodes.contains(node)) {
-            // a cycle was detected
-            return Collections.emptySet();
+            // a cycle was detected, so return the path we have found so far
+            return visitedNodes;
         }
 
         visitedNodes.add(node);
@@ -85,13 +88,17 @@ public class DependencyAnalyzer {
             return Collections.emptySet();
         }
 
-        Set<T> result = new HashSet<T>(directDependencies);
+        Set<T> allDepenedencies = new HashSet<T>(directDependencies);
         for (T dependency : directDependencies) {
-            Set<T> deps = calculateNodeDependencies(dependency, graph, visitedNodes);
-            result.addAll(deps);
+           Set<T> deps = result.get(dependency);
+           if (deps == null || deps.isEmpty()) {
+              deps = calculateNodeDependencies(dependency, graph, visitedNodes, result);
+           }
+            allDepenedencies.addAll(deps);
         }
 
-        return result;
+        result.put(node, allDepenedencies);
+        return allDepenedencies;
     }
 
 }

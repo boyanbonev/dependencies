@@ -30,7 +30,7 @@ public class DependencyAnalyzer {
      * @return a map with key the node and value - a set of all of its
      *         dependencies
      */
-    public <Ò, T> Map<T, Set<T>> calculateDependencies(Map<T, List<T>> graph) {
+    public <T> Map<T, Set<T>> calculateDependencies(Map<T, List<T>> graph) {
         Validate.notNull(graph);
         Validate.notEmpty(graph);
 
@@ -53,7 +53,7 @@ public class DependencyAnalyzer {
      * @return a map with key the node and value - a set of all of its reverse
      *         dependencies
      */
-    public <Ò, T> Map<T, List<T>> calculateInverseDependencies(Map<T, List<T>> graph) {
+    public <T> Map<T, List<T>> calculateInverseDependencies(Map<T, List<T>> graph) {
         Map<T, Set<T>> dependencies = calculateDependencies(graph);
 
         Map<T, List<T>> result = new HashMap<T, List<T>>(dependencies.size());
@@ -73,7 +73,7 @@ public class DependencyAnalyzer {
         return result;
     }
 
-    private <Ò, T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes) {
+    private <T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes) {
         if (visitedNodes.contains(node)) {
             // a cycle was detected
             return Collections.emptySet();

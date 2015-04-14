@@ -1,6 +1,7 @@
 package com.bobo.dependencies;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +78,16 @@ public class DependencyAnalyzerTest {
 
         System.out.println("\nInverse dependencies:");
         ParserUtil.printData(invDependencies);
+
+        Map<String, List<String>> expectedDependencies = new HashMap<String, List<String>>();
+        expectedDependencies.put("A", Arrays.asList("D"));
+        expectedDependencies.put("B", Arrays.asList("A", "D"));
+        expectedDependencies.put("C", Arrays.asList("A", "B", "D"));
+        expectedDependencies.put("D", new ArrayList<String>());
+        expectedDependencies.put("E", Arrays.asList("A", "B", "D"));
+        expectedDependencies.put("F", Arrays.asList("A", "B", "D", "E"));
+
+        Assert.assertEquals(expectedDependencies, invDependencies);
     }
 
     @Test

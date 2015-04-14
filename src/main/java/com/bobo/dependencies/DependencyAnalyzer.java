@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.commons.lang3.Validate;
 
@@ -38,8 +39,10 @@ public class DependencyAnalyzer {
         for (Map.Entry<T, List<T>> entry : graph.entrySet()) {
             Set<T> dependencies = result.get(entry.getKey());
             if (dependencies == null || dependencies.isEmpty()) {
-               dependencies = calculateNodeDependencies(entry.getKey(), graph, new HashSet<T>(), result);
-               result.put(entry.getKey(), dependencies);
+                // dependencies = calculateNodeDependencies(entry.getKey(),
+                // graph, new HashSet<T>(), result);
+                dependencies = calculateNodeDependenciesStack(entry.getKey(), graph);
+                result.put(entry.getKey(), dependencies);
             }
         }
 
@@ -76,7 +79,18 @@ public class DependencyAnalyzer {
         return result;
     }
 
-   private <T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes, Map<T, Set<T>> result) {
+    /**
+     * This implementation is more suited for map-reduce (fork-join).
+     *
+     * @param node
+     * @param graph
+     * @param visitedNodes
+     * @param result
+     * @return
+     */
+    @SuppressWarnings("unused")
+    private <T> Set<T> calculateNodeDependencies(T node, Map<T, List<T>> graph, HashSet<T> visitedNodes,
+            Map<T, Set<T>> result) {
         if (visitedNodes.contains(node)) {
             // a cycle was detected, so return the path we have found so far
             return visitedNodes;
@@ -90,10 +104,10 @@ public class DependencyAnalyzer {
 
         Set<T> allDepenedencies = new HashSet<T>(directDependencies);
         for (T dependency : directDependencies) {
-           Set<T> deps = result.get(dependency);
-           if (deps == null || deps.isEmpty()) {
-              deps = calculateNodeDependencies(dependency, graph, visitedNodes, result);
-           }
+            Set<T> deps = result.get(dependency);
+            if (deps == null || deps.isEmpty()) {
+                deps = calculateNodeDependencies(dependency, graph, visitedNodes, result);
+            }
             allDepenedencies.addAll(deps);
         }
 
@@ -101,4 +115,28 @@ public class DependencyAnalyzer {
         return allDepenedencies;
     }
 
+    private <T> Set<T> calculateNodeDependenciesStack(T node, Map<T, List<T>> graph) {
+        Stack<T> stack = new Stack<T>();
+        stack.push(node);
+
+        Set<T> result = new HashSet<T>();
+        Set<T> visitedNodes = new HashSet<T>();
+        visitedNodes.add(node);
+        while (!stack.isEmpty()) {
+            T currentNode = stack.pop();
+            List<T> directDependencies = graph.get(currentNode);
+            if (directDependencies != null) {
+                for (T dep : directDependencies) {
+                    // no cycle
+                    if (!visitedNodes.contains(dep)) {
+                        stack.push(dep);
+                        visitedNodes.add(dep);
+                    }
+                }
+                result.addAll(directDependencies);
+            }
+        }
+
+        return result;
+    }
 }
